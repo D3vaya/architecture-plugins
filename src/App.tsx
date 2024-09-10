@@ -24,7 +24,7 @@ const App: React.FC = () => {
       <>
         <h1>Plataforma de Pagos</h1>
         <PluginRegistrar /> {/* Registrar plugins dinámicamente */}
-        <PluginManager /> {/* Renderizar plugins registrados */}
+        <PluginManager />
       </>
     </PluginProvider>
   );

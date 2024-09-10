@@ -1,6 +1,6 @@
 import { ReactNode, useEffect, useState } from "react";
 import { CorePlugin, PluginContext } from "../../core/types";
-import { RealBackend } from "./backend";
+import { RealBackend } from "../../core/backend";
 
 export const PluginProvider: React.FC<{ children: ReactNode }> = ({
   children,

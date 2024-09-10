@@ -4,10 +4,11 @@ import React, {
   ReactNode,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
-import { Backend, CorePlugin } from "./types";
-import { RealBackend } from "../plugin/BankA/backend";
+import { CorePlugin } from "./types";
+import { RealBackend } from "./backend";
 
 interface PluginContextType {
   plugins: CorePlugin[];
@@ -18,6 +19,7 @@ const PluginContext = createContext<PluginContextType | undefined>(undefined);
 
 export const usePluginManager = () => {
   const context = useContext(PluginContext);
+
   if (!context) {
     throw new Error("usePluginManager must be used within a PluginProvider");
   }
@@ -30,16 +32,26 @@ export const PluginProvider: React.FC<{ children: ReactNode }> = ({
   const [plugins, setPlugins] = useState<CorePlugin[]>([]);
 
   const registerPlugin = (plugin: CorePlugin) => {
+    const existPlugin = plugins.some((p) => p.name === plugin.name);
+    if (existPlugin) {
+      console.log("Plugin already registered:", plugin.name);
+      return;
+    }
     setPlugins((prevPlugins) => [...prevPlugins, plugin]);
   };
 
-  useEffect(() => {
-    const backend = new RealBackend();
-    plugins.forEach((plugin) => plugin.initialize(backend));
-  }, [plugins]);
+  // useEffect(() => {
+  //   const backend = new RealBackend();
+  //   plugins.forEach((plugin) => plugin.initialize(backend));
+  // }, [plugins]);
 
   return (
-    <PluginContext.Provider value={{ plugins, registerPlugin }}>
+    <PluginContext.Provider
+      value={useMemo(
+        () => ({ plugins, registerPlugin }),
+        [plugins, registerPlugin]
+      )}
+    >
       {children}
     </PluginContext.Provider>
   );
@@ -47,15 +59,17 @@ export const PluginProvider: React.FC<{ children: ReactNode }> = ({
 
 export const PluginManager: React.FC = () => {
   const { plugins } = usePluginManager();
-
   return (
     <div>
-      {plugins.map((plugin) => (
-        <div key={plugin.name} className="plugin-container">
-          <h2>{plugin.name}</h2>
-          {plugin.render()}
-        </div>
-      ))}
+      {plugins.map((plugin, idx) => {
+        plugin.initialize(new RealBackend());
+        return (
+          <div key={"plugin-" + idx + plugin.name} className="plugin-container">
+            <h2>{plugin.name}</h2>
+            {plugin.render()}
+          </div>
+        );
+      })}
     </div>
   );
 };

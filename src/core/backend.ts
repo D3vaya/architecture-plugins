@@ -1,4 +1,4 @@
-import { Backend } from "../../core/types";
+import { Backend } from "./types";
 
 export class RealBackend implements Backend {
   // Implementación real de la lógica de comunicación con el backend
