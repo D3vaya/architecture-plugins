@@ -1,44 +1,53 @@
-import React from "react";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
-import { MockXYZBankPlugin } from "./XYZBankPlugin.mock";
-import { describe, expect, it } from "vitest";
-import { PluginManager } from "../../../core/PluginManager";
-import { PaymentFlowProvider } from "../../../plugin/BankA/context";
-import { PaymentOrchestrator } from "../../../plugin/BankA";
+import { describe, it, expect, beforeEach } from "vitest";
+import { XYZBankPlugin } from "../../../plugin/BankA/plugin";
+import { MockBackend } from "../../../testing/MockBackend";
+import { PluginTestHarness } from "../../../testing/PluginTestHarness";
 
-describe("XYZBankPlugin Integration Tests", () => {
-  it("should authenticate and proceed to account selection", async () => {
-    // Crear instancia de PluginManager y registrar el plugin mockeado
-    const pluginManager = new PluginManager();
-    pluginManager.registerPlugin("XYZBank", {
-      ...MockXYZBankPlugin,
-      AuthComponent: () => <button>Authenticate</button>,
-      AccountSelectionComponent: () => <div>Select Account</div>,
-      AuthorizationComponent: () => null,
-      ExecutePaymentComponent: () => null,
+describe("XYZBankPlugin with PluginTestHarness", () => {
+  let harness: PluginTestHarness;
+
+  beforeEach(() => {
+    const plugin = new XYZBankPlugin(new MockBackend()); // Inicializa el plugin con MockBackend
+    harness = new PluginTestHarness(plugin);
+  });
+
+  it("should authenticate successfully with valid credentials", async () => {
+    const result = await harness.testAuthentication({
+      username: "test",
+      password: "password",
     });
+    expect(result).toEqual({ authToken: "mockAuthToken" });
+  });
 
-    // Renderizar el orquestador con el proveedor "XYZBank"
-    render(
-      <PaymentFlowProvider>
-        <PaymentOrchestrator
-          pluginManager={pluginManager}
-          selectedProvider="XYZBank"
-          credentials={{ username: "user", password: "pass" }}
-          paymentDetails={{ amount: 100, currency: "USD", accountId: "1" }}
-        />
-      </PaymentFlowProvider>
+  it("should fail to authenticate with invalid credentials", async () => {
+    await expect(
+      harness.testAuthentication({ username: "invalid", password: "wrong" })
+    ).rejects.toThrow("Invalid credentials");
+  });
+
+  it("should return a list of accounts after selecting account", async () => {
+    const accounts = await harness.testSelectAccount();
+    expect(accounts).toEqual({
+      accounts: [{ id: "mockAccountId", name: "Mock Account" }],
+    });
+  });
+
+  it("should authorize account successfully", async () => {
+    const authorization = await harness.testAuthorizeAccount("mockAccountId");
+    expect(authorization).toEqual({
+      authorizationToken: "mockAuthorizationToken",
+    });
+  });
+
+  it("should execute payment successfully", async () => {
+    const result = await harness.testExecutePayment(
+      100,
+      "USD",
+      "mockAuthorizationToken"
     );
-
-    // Verificar el componente de autenticación
-    const authButton = screen.getByText("Authenticate");
-    fireEvent.click(authButton);
-
-    // Verificar el resultado de la autenticación
-    await waitFor(() => {
-      expect(screen.getByText("Select Account")).toBeInTheDocument();
+    expect(result).toEqual({
+      success: true,
+      transactionId: "mockTransactionId",
     });
-
-    // Continuar con las pruebas para seleccionar cuenta, autorizar, y ejecutar el pago
   });
 });

@@ -1,9 +1,9 @@
-import { Account, PaymentProviderPlugin } from "../core/types";
+import { XYZBankPlugin } from "../plugin/BankA/plugin";
 
 export class PluginTestHarness {
-  private plugin: PaymentProviderPlugin;
+  private plugin: XYZBankPlugin;
 
-  constructor(plugin: PaymentProviderPlugin) {
+  constructor(plugin: XYZBankPlugin) {
     this.plugin = plugin;
   }
 
@@ -11,15 +11,15 @@ export class PluginTestHarness {
     username: string;
     password: string;
   }) {
-    return await this.plugin.authenticate(credentials);
+    return this.plugin.authenticate(credentials);
   }
 
   async testSelectAccount() {
-    return await this.plugin.selectAccount("authToken");
+    return this.plugin.selectAccount();
   }
 
-  async testAuthorizeAccount(accountId: Account) {
-    return await this.plugin.authorizeAccount(accountId);
+  async testAuthorizeAccount(accountId: string) {
+    return this.plugin.authorizeAccount(accountId);
   }
 
   async testExecutePayment(
@@ -27,10 +27,6 @@ export class PluginTestHarness {
     currency: string,
     authorizationToken: string
   ) {
-    return await this.plugin.executePayment({
-      amount,
-      currency,
-      accountId: "accountId",
-    });
+    return this.plugin.executePayment(amount, currency, authorizationToken);
   }
 }

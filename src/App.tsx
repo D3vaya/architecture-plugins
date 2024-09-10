@@ -1,29 +1,33 @@
-import "./App.css";
-import { PluginManager } from "./core/PluginManager";
-import { PaymentFlowProvider } from "./plugin/BankA/context";
-import { PaymentOrchestrator } from "./plugin/BankA/payment-or";
+// src/App.tsx
+import React, { useEffect } from "react";
+import {
+  PluginProvider,
+  PluginManager,
+  usePluginManager,
+} from "./core/PluginManager";
 import { XYZBankPlugin } from "./plugin/BankA/plugin";
 
-function App() {
-  const pluginManager = new PluginManager();
-  pluginManager.registerPlugin("XYZBank", new XYZBankPlugin());
+const PluginRegistrar: React.FC = () => {
+  const { registerPlugin } = usePluginManager();
 
-  // Configurar las propiedades requeridas por PaymentOrchestrator
-  const selectedProvider = "XYZBank"; // Proveedor seleccionado
-  const initialCredentials = { username: "hola", password: "123" }; // Credenciales iniciales vacías
-  const paymentDetails = { amount: 100, currency: "USD", accountId: "" }; // Detalles del pago
+  useEffect(() => {
+    const xyzBankPlugin = new XYZBankPlugin();
+    registerPlugin(xyzBankPlugin);
+  }, []);
 
+  return null;
+};
+
+const App: React.FC = () => {
   return (
-    <PaymentFlowProvider>
-      {/* Componente de Orquestador de Pagos */}
-      <PaymentOrchestrator
-        pluginManager={pluginManager}
-        selectedProvider={selectedProvider}
-        credentials={initialCredentials}
-        paymentDetails={paymentDetails}
-      />
-    </PaymentFlowProvider>
+    <PluginProvider>
+      <>
+        <h1>Plataforma de Pagos</h1>
+        <PluginRegistrar /> {/* Registrar plugins dinámicamente */}
+        <PluginManager /> {/* Renderizar plugins registrados */}
+      </>
+    </PluginProvider>
   );
-}
+};
 
 export default App;

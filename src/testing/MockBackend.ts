@@ -1,5 +1,8 @@
 export class MockBackend {
-  static authenticate(credentials: { username: string; password: string }) {
+  async authenticate(credentials: {
+    username: string;
+    password: string;
+  }): Promise<{ authToken: string }> {
     if (
       credentials.username === "test" &&
       credentials.password === "password"
@@ -9,25 +12,23 @@ export class MockBackend {
     throw new Error("Invalid credentials");
   }
 
-  static selectAccount() {
+  async selectAccount(): Promise<{
+    accounts: Array<{ id: string; name: string }>;
+  }> {
     return { accounts: [{ id: "mockAccountId", name: "Mock Account" }] };
   }
 
-  static authorizeAccount(accountId: string) {
-    if (accountId === "mockAccountId") {
-      return { authorizationToken: "mockAuthorizationToken" };
-    }
-    throw new Error("Invalid account ID");
+  async authorizeAccount(
+    accountId: string
+  ): Promise<{ authorizationToken: string }> {
+    return { authorizationToken: "mockAuthorizationToken" };
   }
 
-  static executePayment(
+  async executePayment(
     amount: number,
     currency: string,
     authorizationToken: string
-  ) {
-    if (authorizationToken === "mockAuthorizationToken") {
-      return { success: true, transactionId: "mockTransactionId" };
-    }
-    throw new Error("Invalid authorization token");
+  ): Promise<{ success: boolean; transactionId: string }> {
+    return { success: true, transactionId: "mockTransactionId" };
   }
 }
