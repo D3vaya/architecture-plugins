@@ -1,7 +1,7 @@
 import { Backend, CorePlugin } from "../../core/types";
-import { XYZBankPluginComponent } from "./flow";
+import { XYZBankPluginComponent } from "./component";
 
-export class XYZBankPlugin implements CorePlugin {
+export class BankAPlugin implements CorePlugin {
   name = "Plugin Bank A";
   private backend!: Backend;
 

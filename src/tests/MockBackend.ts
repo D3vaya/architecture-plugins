@@ -1,15 +1,12 @@
-export class MockBackend {
-  async authenticate(credentials: {
+import { Backend } from "../core/types";
+
+// backendMock.ts
+export class BackendMock implements Backend {
+  async authenticate(_credentials: {
     username: string;
     password: string;
   }): Promise<{ authToken: string }> {
-    if (
-      credentials.username === "test" &&
-      credentials.password === "password"
-    ) {
-      return { authToken: "mockAuthToken" };
-    }
-    throw new Error("Invalid credentials");
+    return { authToken: "mockAuthToken" };
   }
 
   async selectAccount(): Promise<{
@@ -19,15 +16,15 @@ export class MockBackend {
   }
 
   async authorizeAccount(
-    accountId: string
+    _accountId: string
   ): Promise<{ authorizationToken: string }> {
     return { authorizationToken: "mockAuthorizationToken" };
   }
 
   async executePayment(
-    amount: number,
-    currency: string,
-    authorizationToken: string
+    _amount: number,
+    _currency: string,
+    _authorizationToken: string
   ): Promise<{ success: boolean; transactionId: string }> {
     return { success: true, transactionId: "mockTransactionId" };
   }

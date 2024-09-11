@@ -1,31 +1,13 @@
-// src/App.tsx
-import React, { useEffect } from "react";
-import {
-  PluginProvider,
-  PluginManager,
-  usePluginManager,
-} from "./core/PluginManager";
-import { XYZBankPlugin } from "./plugin/BankA/plugin";
-
-const PluginRegistrar: React.FC = () => {
-  const { registerPlugin } = usePluginManager();
-
-  useEffect(() => {
-    const xyzBankPlugin = new XYZBankPlugin();
-    registerPlugin(xyzBankPlugin);
-  }, []);
-
-  return null;
-};
+import React from "react";
+import { PluginProvider } from "./core/context/core.provider";
+import Funnel from "./views/Funnel";
 
 const App: React.FC = () => {
   return (
     <PluginProvider>
-      <>
-        <h1>Plataforma de Pagos</h1>
-        <PluginRegistrar /> {/* Registrar plugins dinámicamente */}
-        <PluginManager />
-      </>
+      <h1>Plataforma de Pagos</h1>
+      {/* <PluginRegistrar /> */}
+      <Funnel />
     </PluginProvider>
   );
 };

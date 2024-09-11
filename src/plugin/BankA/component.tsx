@@ -11,7 +11,6 @@ export const XYZBankPluginComponent: React.FC<XYZBankPluginComponentProps> = ({
 }) => {
   const handleAuthenticate = async () => {
     try {
-      console.log(backend);
       const authToken = await backend.authenticate({
         username: "hola",
         password: "123",

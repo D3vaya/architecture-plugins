@@ -1,6 +1,6 @@
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import { CorePlugin, PluginContext } from "../../core/types";
-import { RealBackend } from "../../core/backend";
+import { BackendService } from "../../core/backend";
 
 export const PluginProvider: React.FC<{ children: ReactNode }> = ({
   children,
@@ -13,12 +13,17 @@ export const PluginProvider: React.FC<{ children: ReactNode }> = ({
 
   // Inicia los plugins registrados
   useEffect(() => {
-    const backend = new RealBackend(); // Crea una instancia del backend real o mock
+    const backend = new BackendService(); // Crea una instancia del backend real o mock
     plugins.forEach((plugin) => plugin.initialize(backend));
   }, [plugins]);
 
   return (
-    <PluginContext.Provider value={{ plugins, registerPlugin }}>
+    <PluginContext.Provider
+      value={useMemo(
+        () => ({ plugins, registerPlugin }),
+        [plugins, registerPlugin]
+      )}
+    >
       {children}
     </PluginContext.Provider>
   );

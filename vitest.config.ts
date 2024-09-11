@@ -1,14 +1,12 @@
+// vitest.config.ts
 import { defineConfig } from "vitest/config";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
+  plugins: [react()],
   test: {
     globals: true,
-    environment: "jsdom",
-    setupFiles: "./src/tests/setupTests.ts",
-    coverage: {
-      provider: "istanbul", // o 'c8'
-      reporter: ["text", "json", "html"],
-      reportsDirectory: "./coverage",
-    },
+    environment: "jsdom", // Utiliza jsdom para pruebas en React
+    setupFiles: "./vitest.setup.ts", // Archivo de configuración adicional
   },
 });
